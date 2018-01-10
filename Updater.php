@@ -52,7 +52,7 @@ class Updater {
 			echo '<input type="submit" value="Continue &raquo;" class="btn btn-default">';
 			echo '</form>';
 ?><script>
-var auto_submit_countdown = 4;
+var auto_submit_countdown = 30;
 addLoadEvent(function() {
 	setInterval(function() {
       var submit = $("form#update_form").find(':submit');
@@ -119,13 +119,34 @@ addLoadEvent(function() {
 			echo 'Status Error: ' . $data['status'];
 			exit;
 		}
+		
+		// Prioritize Core and Updater
+		$updates = [];
+		foreach ($data['updates'] as $update) {
+			if ($update=='Core') {
+				$updates[] = $update;
+				break;
+			}
+		}
+		foreach ($data['updates'] as $update) {
+			if ($update=='Updater') {
+				$updates[] = $update;
+				break;
+			}
+		}
+		foreach ($data['updates'] as $update) {
+			if (!in_array($update, $updates)) {
+				$updates[] = $update;
+			}
+		}
+		
 		if (empty($data['updates'])) {
 			echo '<div class="alert alert-success" role="alert">All modules are currently up-to-date.</div>';
 		} else {
 			echo '<form method="POST"><div class="alert alert-danger" role="alert">Updates are available for: ';
 			$out = '';
 			$form = '';
-			foreach ($data['updates'] as $update) {
+			foreach ($updates as $update) {
 				$out.= $update . ', ';
 				$form.= '<input type="hidden" name="modules[]" value="' . $update . '">';
 			}
