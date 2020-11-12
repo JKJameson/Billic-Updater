@@ -141,7 +141,7 @@ addLoadEvent(function() {
 		}
 		
 		if (empty($data['updates'])) {
-			echo '<div class="alert alert-success" role="alert">All modules are currently up-to-date.</div>';
+			echo 'All modules are currently up-to-date.';
 		} else {
 			echo '<form method="POST"><div class="alert alert-danger" role="alert">Updates are available for: ';
 			$out = '';
