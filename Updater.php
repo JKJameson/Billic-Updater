@@ -164,7 +164,7 @@ addLoadEvent(function() {
 		$DashboardBillicUpdateCache = get_config('DashboardBillicUpdateCache');
 		$DashboardBillicUpdateCache = json_decode($DashboardBillicUpdateCache, true);
 		$error = false;
-		$r = '<br>';
+		$r = '';
 		if (isset($_POST['BillicUpdateCheck']) || $DashboardBillicUpdateCache['lastcheck'] < time() - 3600) {
 			$lastcheck_text = 'Just Now';
 			$modules = $db->q('SELECT `id`, `version` FROM `installed_modules` ORDER BY `id` ASC');
