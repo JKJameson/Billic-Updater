@@ -219,11 +219,11 @@ addLoadEvent(function() {
 			$r.= '<div class="alert alert-danger" role="alert">' . $error . '</div>';
 		}
 		if ($updates_available > 0) {
-			$r.= '<div class="alert alert-danger" role="alert">There are ' . count($updates_available) . ' updates available!</div><a href="/Admin/Updater/" class="btn btn-default">Go to Updater &raquo;</a></form>';
+			$r.= '<div class="alert alert-danger" role="alert">There are ' . $updates_available . ' updates available!</div><a href="/Admin/Updater/" class="btn btn-default btn-sm">Go to Updater &raquo;</a></form>';
 		} else {
-			$r.= '<div class="alert alert-success" role="alert">All modules are currently up-to-date.<br>Last checked: ' . $lastcheck_text . '</div>';
+			$r.= 'All modules are currently up-to-date.<br>Last checked: ' . $lastcheck_text;
 			if ($lastcheck_text != 'Just Now') {
-				$r.= '<form method="POST"><input type="submit" class="btn btn-default" name="BillicUpdateCheck" value="Check Now &raquo;"></form>';
+				$r.= '<form method="POST"><input type="submit" class="btn btn-default btn-sm" name="BillicUpdateCheck" value="Check Now &raquo;"></form>';
 			}
 		}
 		return array(
