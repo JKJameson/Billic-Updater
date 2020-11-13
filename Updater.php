@@ -165,7 +165,7 @@ addLoadEvent(function() {
 		$DashboardBillicUpdateCache = json_decode($DashboardBillicUpdateCache, true);
 		$error = false;
 		$r = '';
-		if (isset($_POST['BillicUpdateCheck']) || $DashboardBillicUpdateCache['lastcheck'] < time() - 3600) {
+		if (isset($_POST['BillicUpdateCheck']) || $DashboardBillicUpdateCache['lastcheck'] < time() - 84600) {
 			$lastcheck_text = 'Just Now';
 			$modules = $db->q('SELECT `id`, `version` FROM `installed_modules` ORDER BY `id` ASC');
 			$send = array();
@@ -207,14 +207,15 @@ addLoadEvent(function() {
 				} else if ($data['status'] != 'OK') {
 					$error = 'Status Error: ' . $data['status'];
 				} else {
-					$updates_available = count($data['updates']);
-					set_config('DashboardBillicUpdateCache', json_encode(array()));
+					$DashboardBillicUpdateCache['updates_available'] = count($data['updates']);
+					$DashboardBillicUpdateCache['lastcheck'] = time();
+					set_config('DashboardBillicUpdateCache', json_encode($DashboardBillicUpdateCache));
 				}
 			}
 		} else {
 			$lastcheck_text = $billic->time_ago($DashboardBillicUpdateCache['lastcheck']) . ' ago';
-			$updates_available = $DashboardBillicUpdateCache['updates_available'];
 		}
+		$updates_available = $DashboardBillicUpdateCache['updates_available'];
 		if ($error !== false) {
 			$r.= '<div class="alert alert-danger" role="alert">' . $error . '</div>';
 		}
