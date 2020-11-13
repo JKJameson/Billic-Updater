@@ -43,7 +43,7 @@ class Updater {
 				echo '<b>Error:</b> ' . $install;
 				exit;
 			}
-			set_config('DashboardBillicUpdateCache', json_encode([]))
+			set_config('DashboardBillicUpdateCache', json_encode([]));
 			echo '<br><font color="green">Success!</font><br><br>';
 			echo '<form method="POST" id="update_form">';
 			foreach ($_POST['modules'] as $id) {
