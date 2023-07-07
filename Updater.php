@@ -43,7 +43,6 @@ class Updater {
 				echo '<b>Error:</b> ' . $install;
 				exit;
 			}
-			set_config('DashboardBillicUpdateCache', json_encode([]));
 			echo '<br><font color="green">Success!</font><br><br>';
 			echo '<form method="POST" id="update_form">';
 			foreach ($_POST['modules'] as $id) {
@@ -88,12 +87,12 @@ addLoadEvent(function() {
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_USERAGENT => "Curl/Billic",
 			CURLOPT_AUTOREFERER => true,
-			CURLOPT_CONNECTTIMEOUT => 5,
-			CURLOPT_TIMEOUT => 10,
-			CURLOPT_MAXREDIRS => 1,
+			CURLOPT_CONNECTTIMEOUT => 30,
+			CURLOPT_TIMEOUT => 60,
+			CURLOPT_MAXREDIRS => 5,
 			CURLOPT_SSL_VERIFYHOST => true,
 			CURLOPT_SSL_VERIFYPEER => false,
-			CURLOPT_URL => 'https://billic.com/API/',
+			CURLOPT_URL => 'https://www.billic.com/API/',
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => array(
 				'module' => 'ModuleEditor',
@@ -142,7 +141,7 @@ addLoadEvent(function() {
 		}
 		
 		if (empty($data['updates'])) {
-			echo 'All modules are currently up-to-date.';
+			echo '<div class="alert alert-success" role="alert">All modules are currently up-to-date.</div>';
 		} else {
 			echo '<form method="POST"><div class="alert alert-danger" role="alert">Updates are available for: ';
 			$out = '';
@@ -165,8 +164,8 @@ addLoadEvent(function() {
 		$DashboardBillicUpdateCache = get_config('DashboardBillicUpdateCache');
 		$DashboardBillicUpdateCache = json_decode($DashboardBillicUpdateCache, true);
 		$error = false;
-		$r = '';
-		if (isset($_POST['BillicUpdateCheck']) || $DashboardBillicUpdateCache['lastcheck'] < time() - 84600) {
+		$r = '<br>';
+		if (isset($_POST['BillicUpdateCheck']) || !array_key_exists('lastcheck', $DashboardBillicUpdateCache) || $DashboardBillicUpdateCache['lastcheck'] < time() - 3600) {
 			$lastcheck_text = 'Just Now';
 			$modules = $db->q('SELECT `id`, `version` FROM `installed_modules` ORDER BY `id` ASC');
 			$send = array();
@@ -208,24 +207,23 @@ addLoadEvent(function() {
 				} else if ($data['status'] != 'OK') {
 					$error = 'Status Error: ' . $data['status'];
 				} else {
-					$DashboardBillicUpdateCache['updates_available'] = count($data['updates']);
-					$DashboardBillicUpdateCache['lastcheck'] = time();
-					set_config('DashboardBillicUpdateCache', json_encode($DashboardBillicUpdateCache));
+					$updates_available = count($data['updates']);
+					set_config('DashboardBillicUpdateCache', json_encode(array()));
 				}
 			}
 		} else {
 			$lastcheck_text = $billic->time_ago($DashboardBillicUpdateCache['lastcheck']) . ' ago';
+			$updates_available = $DashboardBillicUpdateCache['updates_available'];
 		}
-		$updates_available = $DashboardBillicUpdateCache['updates_available'];
 		if ($error !== false) {
 			$r.= '<div class="alert alert-danger" role="alert">' . $error . '</div>';
 		}
 		if ($updates_available > 0) {
-			$r.= '<div class="alert alert-danger" role="alert">There are ' . $updates_available . ' updates available!</div><a href="/Admin/Updater/" class="btn btn-default btn-sm">Go to Updater &raquo;</a></form>';
+			$r.= '<div class="alert alert-danger" role="alert">There are ' . $updates_available . ' updates available!</div><a href="/Admin/Updater/" class="btn btn-primary">Go to Updater &raquo;</a></form>';
 		} else {
-			$r.= 'All modules are currently up-to-date.<br>Last checked: ' . $lastcheck_text;
+			$r.= '<div class="alert alert-success" role="alert">All modules are currently up-to-date.<br>Last checked: ' . $lastcheck_text . '</div>';
 			if ($lastcheck_text != 'Just Now') {
-				$r.= '<form method="POST"><input type="submit" class="btn btn-default btn-sm" name="BillicUpdateCheck" value="Check Now &raquo;"></form>';
+				$r.= '<form method="POST"><input type="submit" class="btn btn-default" name="BillicUpdateCheck" value="Check Now &raquo;"></form>';
 			}
 		}
 		return array(
